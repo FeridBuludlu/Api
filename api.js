@@ -1,45 +1,47 @@
-const artanBtn = document.getElementById('artan');
-const azalanBtn = document.getElementById('az');
+const container = document.querySelector(".container");
+const artanButton = document.getElementById("artan");
+const azalanButton = document.getElementById("az");
 
-artanBtn.addEventListener('click', sortArtan);
-azalanBtn.addEventListener('click', sortAzalan);
-
-async function fetchAndDisplayProducts() {
-  try {
-      const response = await fetch("https://fakestoreapi.com/products");
-      const products = await response.json();
-      displayProducts(products);
-  } catch (error) {
-      console.error('Error fetching products:', error);
-  }
-}
-
-function displayProducts(products) {
-  container.innerHTML = '';
-  products.forEach(product => {
-      container.innerHTML += `
-      <div class="card">
+const renderProducts = (productsArray) => {
+  container.innerHTML = "";
+  for (let i = 0; i < productsArray.length; i++) {
+    const product = productsArray[i];
+    container.innerHTML += `
+        <div class="card">
           <img src="${product.image}" alt="">
           <h2>${product.title}</h2>
           <p>Price: ${product.price}$</p>
           <p>${product.description}</p>
-      </div>`;
+        </div>
+      `;
+  }
+};
+
+fetch("https://fakestoreapi.com/products")
+  .then((response) => response.json())
+  .then((json) => {
+    renderProducts(json);
   });
-}
 
-async function sortArtan() {
-  const response = await fetch("https://fakestoreapi.com/products?sort=asc");
-  const products = await response.json();
-  displayProducts(products);
-}
+artanButton.addEventListener("click", (e)=> {
+  fetch("https://fakestoreapi.com/products")
+    .then((response) => response.json())
+    .then((json) => {
+      let list = [...json];
+      list.sort((a, b) => a.price - b.price);
+      renderProducts(list);
+    });
+});
 
-async function sortAzalan() {
-  const response = await fetch("https://fakestoreapi.com/products?sort=desc");
-  const products = await response.json();
-  displayProducts(products);
-}
+azalanButton.addEventListener("click",(e)=>  {
+  fetch("https://fakestoreapi.com/products")
+    .then((response) => response.json())
+    .then((json) => {
+      let list = [...json];
+      list.sort((a, b) => b.price - a.price);
+      renderProducts(list);
+    });
+});
 
 
-const container = document.querySelector('.container')
 
-fetchAndDisplayProducts();
